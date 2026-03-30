@@ -87,6 +87,10 @@ This runs the default user profile (pop + happy + high energy) against all 10 so
 - Detailed breakdown of reasons for each recommendation
 - Clear visualization of why song #1 ranks higher than song #2
 
+**Example Output:**
+
+![Music Recommender CLI Output](Screenshot%202026-03-29%20223659.png)
+
 **Programmatic Usage:**
 
 ```python
