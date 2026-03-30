@@ -2,32 +2,103 @@
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
+This is a **content-based music recommender system** that scores songs based on user taste profiles and returns the most compatible recommendations.
 
-Your goal is to:
+### How It Works
 
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
+The system uses a **weighted scoring algorithm** to match songs with user preferences:
 
-Replace this paragraph with your own summary of what your version does.
+**User Profile includes:**
+- `favorite_genre`: Genre preference (e.g., "pop")
+- `favorite_mood`: Mood preference (e.g., "happy")
+- `target_energy`: Preferred energy level (0.0–1.0)
+- `likes_acoustic`: Boolean preference for acoustic vs. electronic
+
+**Scoring Formula (max 125 points):**
+- Genre match: **+35 points** (exact match)
+- Mood match: **+40 points** (exact match)
+- Energy similarity: **+40 points** (within 0.3 of target)
+- Acousticness preference: **+10 points** (>0.7 if acoustic preference, <0.3 if not)
+
+**Song Features:**
+- id, title, artist, genre, mood
+- energy (0-1), tempo_bpm, valence, danceability, acousticness
+
+**Recommendation Output:**
+- Top-k songs ranked by score
+- Each recommendation includes the score breakdown showing which criteria matched
+
+### Example Run
+
+For a user preferring **pop + happy + high energy (0.8) + not acoustic**:
+
+```
+User Profile: pop + happy + energy 0.8
+
+1. SUNRISE CITY
+   Artist:  Neon Echo
+   Score:   125/125
+   Reasons: Genre match (+35) · Mood match (+40) · Energy match (0.82 vs 0.80) (+40) · Not acoustic (0.18) (+10)
+
+2. GYM HERO
+   Artist:  Max Pulse
+   Score:   85/125
+   Reasons: Genre match (+35) · Energy match (0.93 vs 0.80) (+40) · Not acoustic (0.05) (+10)
+
+3. ROOFTOP LIGHTS
+   Artist:  Indigo Parade
+   Score:   80/125
+   Reasons: Mood match (+40) · Energy match (0.76 vs 0.80) (+40)
+```
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+This is a **weighted content-based recommender** that:
 
-Some prompts to answer:
+1. **Loads songs** from CSV with all audio features
+2. **Scores each song** against the user profile by:
+   - Checking exact matches on genre/mood
+   - Computing similarity on numeric features (energy, acousticness)
+   - Weighted combination to produce final score
+3. **Ranks all songs** by score and returns top-k
+4. **Explains each recommendation** with detailed breakdown of why it scored
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+### Algorithm Design Philosophy
 
-You can include a simple diagram or bullet list if helpful.
+- **Genre & Mood** are primary signals (35 + 40 = 75 points)
+- **Energy** is equally important (40 points), allowing good matches even without genre
+- **Acousticness** is a refinement bonus (10 points)
+- **Why this matters:** Prevents genre from being a complete "veto" blocker—a user can still get great recommendations through energy + mood alignment
+
+---
+
+## Running the Recommender
+
+**CLI-First Simulation:**
+
+```bash
+python src/main.py
+```
+
+This runs the default user profile (pop + happy + high energy) against all 10 songs in the dataset and displays:
+- Ranked recommendations with scores
+- Detailed breakdown of reasons for each recommendation
+- Clear visualization of why song #1 ranks higher than song #2
+
+**Programmatic Usage:**
+
+```python
+from src.recommender import load_songs, recommend_songs
+
+songs = load_songs("data/songs.csv")
+user_prefs = {"genre": "lofi", "mood": "chill", "energy": 0.35, "likes_acoustic": True}
+recommendations = recommend_songs(user_prefs, songs, k=5)
+
+for song, score, reasons in recommendations:
+    print(f"{song['title']}: {score}/125 - {' · '.join(reasons)}")
+```
 
 ---
 
