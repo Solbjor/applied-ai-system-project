@@ -255,3 +255,75 @@ recommend_songs(user_prefs, songs, k=5) → List[(song_dict, score, reasons)]
 - **src/main.py** — CLI interface with formatted output
 - **tests/test_recommender.py** — 2 unit tests (both passing)
 - **ALGORITHM_DESIGN.md** — This file; complete design documentation
+
+---
+
+## Phase 4: Evaluation & Bias Analysis
+
+### Tests Conducted
+
+**Test 1: Pop Lover** (pop + happy + 0.8 energy + NOT acoustic)
+- ✅ Sunrise City ranked #1 with perfect 125/125 score
+- ✅ Gym Hero ranked #2 at 85/125 (mood mismatch penalty correct)
+- ✅ Rooftop Lights ranked #3 at 80/125 (non-pop genre, but mood+energy carried it)
+
+**Test 2: Lo-Fi Listener** (lofi + chill + 0.35 energy + likes acoustic)
+- ✅ Midnight Coding & Library Rain tied at 125/125 (perfect matches)
+- ✅ Spacewalk Thoughts ranked #3 at 90/125 (ambient genre, not lofi, but mood+energy+acoustic aligned)
+- **Key finding:** Genre alone doesn't veto; other factors compensate
+
+**Test 3: Rock Fan** (rock + intense + 0.9 energy + NOT acoustic)
+- ✅ Storm Runner ranked #1 at 125/125 (only rock song)
+- ⚠️ Gym Hero #2 at 90/125 (must fall back to pop; limited rock options)
+- **Key finding:** Only 1 rock song limits diversity
+
+### Experiments
+
+**Experiment 1: Genre Veto** — Can other features compensate for genre mismatch?
+- Profile: reggae (NOT in dataset) + happy + 0.8 energy
+- Result: Sunrise City scored 90/125 despite being pop, not reggae
+- **Finding:** Energy + mood sufficient for decent scores; genre not a complete blocker
+
+**Experiment 2: Acousticness Impact** — How much does acoustic preference matter?
+- Same user, different acoustic preferences:
+  - Likes acoustic: Score 125/125
+  - Dislikes acoustic: Score 115/125 (only -10 difference)
+- **Finding:** Acousticness adds/removes 8% of max score when other factors match
+
+### 6 Identified Biases
+
+| Bias | Description | Impact | Severity |
+|------|-------------|--------|----------|
+| **Binary Energy** | Energy within 0.3 = +40; outside = 0 (no gradient) | No partial credit for "close" energy | 🟡 Medium |
+| **Limited Dataset** | 10 songs, 7 genres; rock=1, electronic=0 | Niche genre fans get limited choices | 🔴 High |
+| **No Genre Similarity** | Pop ≠ Indie Pop (exact match only) | Miss related-genre recommendations | 🟡 Medium |
+| **Hard Acousticness Thresholds** | 0.69 →0 pts; 0.71 →10 pts (jump at boundary) | Unrealistic binary preference | 🟡 Medium |
+| **Acousticness Weight Disparity** | 10 pts is 8% for good matches, 20% for poor | Over-rewards acoustic for bad matches | 🟢 Low |
+| **Niche Genre Constraint** | Rock fans see 1 song before recommendations exhaust | Can't serve diversity for niche users | 🔴 High |
+
+### Recommendations for Improvement
+
+**Short Term (Easy Fixes):**
+- Replace binary energy with gradual: `(1 - |diff|/0.3) * 40`
+- Add genre similarity dictionary (pop ↔ indie pop at 70% similarity)
+- Use continuous acousticness scale (0-10) instead of binary thresholds
+
+**Medium Term (Enhancements):**
+- Expand dataset to 50+ songs across 15+ genres
+- Add user feedback loop (thumbs up/down to learn preferences)
+- Implement diversity constraint (don't recommend all from one genre)
+
+**Long Term (Architecture Change):**
+- Integrate real music dataset (Spotify API)
+- Add collaborative filtering ("Users like you also enjoyed...")
+- Use embeddings-based recommendations (neural nets learn song similarity)
+
+---
+
+## Summary
+
+**What Works:** Transparent, explainable rankings for mainstream tastes  
+**What Doesn't:** Niche genres, binary thresholds, small dataset  
+**Key Lesson:** Simple approaches are good for explainability, but require more data and nuanced scoring to handle the full spectrum of user preferences
+
+This recommender successfully demonstrates the **core concepts of recommendation systems** while highlighting why production systems are vastly more complex!

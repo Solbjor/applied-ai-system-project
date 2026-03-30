@@ -2,110 +2,73 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**ContentMatch v1.0** — A weighted, content-based music recommender system
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+Classroom exploration tool for content-based recommendation algorithms. Generates song recommendations (from 10 songs) based on 4 user taste dimensions: genre, mood, energy, and acoustic preference. **Not suitable for real-world deployment.**
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+Scores each song (max 125 points) by matching user taste:
+- **Genre match:** +35 (exact match) or 0
+- **Mood match:** +40 (exact match) or 0  
+- **Energy match:** +40 (within ±0.3 of target) or 0
+- **Acousticness match:** +10 (>0.7 if acoustic preference, <0.3 if not) or 0
 
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+Returns top-5 songs ranked by score with reason breakdown.
 
 ---
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
+**Dataset:** 10 songs from `data/songs.csv` across 7 genres (Pop 2, Lofi 3, Rock 1, Ambient 1, Jazz 1, Synthwave 1, Indie Pop 1)
 
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+**Limitations:** Very limited genre representation; missing reggae, hip-hop, electronic, metal, country, R&B, etc. Rock fans get 1 recommendation; electronic fans get 0.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+- **Transparent:** Every recommendation shows point breakdown and reasons
+- **Reasonable for mainstream tastes:** Pop, lofi, ambient users get expected results
+- **Non-genre-veto:** Songs can score 50-90 without genre match through mood+energy alignment
+- **Captures vibe:** Energy and acousticness matter equally to genre
 
 ---
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
+**6 Key Biases Identified:**
 
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+1. **Binary Energy:** Full credit (±0.3) or zero; no partial credit for close misses
+2. **Genre Dominance:** Rock fans get 1 song, electronic fans get 0—limited diversity for niche tastes
+3. **No Genre Similarity:** Pop ≠ Indie Pop despite being musically adjacent
+4. **Acousticness Hard Thresholds:** Song at 0.69 gets 0 points; 0.71 gets 10 (cliff effect)
+5. **Dataset Size:** Only 10 songs can't serve diverse preferences
+6. **Weight Disparity:** Acousticness becomes 8-20% of score depending on match quality
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+**Testing Summary:**
+- **Pop Lover (pop+happy+0.8 energy+not acoustic):** Sunrise City ranked #1 at 125/125 ✓
+- **Lofi Listener (lofi+chill+0.35 energy+acoustic):** Midnight Coding ranked #1 at 125/125 ✓  
+- **Rock Fan (rock+intense+0.85 energy+not acoustic):** Storm Runner ranked #1 but limited fallback options
+- **Genre Veto Test:** Reggae user got 50-90 point songs despite genre mismatch (shows no hard veto)
+- **Acousticness Impact:** Same user with flipped preference showed 8-10 point swing
 
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+For detailed test results, see [PHASE4_EVALUATION.md](PHASE4_EVALUATION.md).
 
 ---
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
-
----
-
-## 9. Personal Reflection  
-
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+**High Priority:** Expand dataset to 100+ songs, gradient energy scoring, genre similarity map  
+**Medium Priority:** Continuous acousticness scale, fix weight disparity, multi-seed preferences  
+**Long Term:** Collaborative filtering, exploration (discovery), temporal mood patterns

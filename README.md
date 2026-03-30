@@ -1,5 +1,9 @@
 # 🎵 Music Recommender Simulation
 
+## Reflection
+
+This project has a lot of detailed steps that involve heavy hands-on analysis and thinking, which is crucial for students. Not only will they be using AI to help them plan as before, but they will also be using it to thoroughly check their logic in depth, without it necessarily doing it for them. One thing I found useful was the back and forth discussing my algorithm creation and my reasonings with my AI assistant, since it lets me get real-time feedback and analysis on my thought process. However, it's important to not just rely on this as usual. I think students will need to navigate troubleshooting their logic carefully as the AI can make mistakes as usual. Other than that, I think students will learn a lot about the deep thinking required to make algorithmic models catering to people's tastes. 
+
 ## Project Summary
 
 This is a **content-based music recommender system** that scores songs based on user taste profiles and returns the most compatible recommendations.
@@ -71,6 +75,43 @@ This is a **weighted content-based recommender** that:
 - **Energy** is equally important (40 points), allowing good matches even without genre
 - **Acousticness** is a refinement bonus (10 points)
 - **Why this matters:** Prevents genre from being a complete "veto" blocker—a user can still get great recommendations through energy + mood alignment
+
+---
+
+## Limitations & Biases
+
+The recommender has **6 identified limitations** discovered during Phase 4 evaluation:
+
+### **1. Binary Energy Scoring** ⚠️
+- Songs within 0.3 of target energy get full +40 points; outside get 0 points
+- No gradual credit for "close but not exact" matches
+- Energy 0.50 vs target 0.80 gets same 0 points as energy 0.001 vs target 0.80
+
+### **2. Limited Dataset** ⚠️
+- Only 10 songs across 7 genres
+- Rock fans → 1 recommendation; Electronic fans → 0 recommendations
+- Real systems have millions of songs to mitigate this
+
+### **3. No Genre Similarity** ⚠️
+- Pop ≠ Indie Pop (exact matching only)
+- Users miss related-genre recommendations
+- Should treat pop ↔ indie pop with 70% similarity
+
+### **4. Acousticness Hard Thresholds** ⚠️
+- Acousticness >0.7 = "acoustic"; <0.3 = "not acoustic"
+- Song at 0.69 gets 0 points; 0.71 gets 10 points
+- Should use continuous scale (0-10 based on 0-1 range)
+
+### **5. Acousticness Weight Disparity** ⚠️
+- +10 points is always 8% of score for good matches
+- For poor matches, becomes 20% of score (disproportionate)
+- Might over-recommend acoustic songs when other factors fail
+
+### **6. Small Dataset Constrains Diversity** ⚠️
+- Can't serve niche genre preferences (e.g., reggae, metal)
+- Limited to 10 total recommendations before repeating
+
+**For a detailed analysis, see [PHASE4_EVALUATION.md](PHASE4_EVALUATION.md) and [model_card.md](model_card.md)**
 
 ---
 
@@ -162,20 +203,6 @@ Examples:
 - It might over favor one genre or mood
 
 You will go deeper on this in your model card.
-
----
-
-## Reflection
-
-Read and complete `model_card.md`:
-
-[**Model Card**](model_card.md)
-
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
 
 ---
 
