@@ -1,6 +1,10 @@
-# 🎵 Music Recommender Simulation
+# 🎵 Enhanced Music Recommender Simulation
 
-## Reflection
+## Summary
+For this enhanced project we took a prior module's "show" assignment and modified it to use a real AI feature. Students need to understand that this project uses actual concepts and core elements that AI uses and implementing them into a our project to enhance the "analog" features we started off this project with. In my case, I chose to use supervised learning to provide feedback on the recommendation algorithm of the music recommender and help it improve its overall reliability and accuracy. Students are likely to struggle with learning how to properly implement this feature with their current set up, since you need to make sure that the new weights or improvements to the algorithm are actually being implemented after each run of the learning model. AI was helpful with properly mapping out this new data flow and how it all fits together, but at times it made errors when trying to implement as tends to happen, necesitating further manual review of the code and overall design to verify everything actually works well. I would encourage students to keep planning as much as they can and if need be revisit some of the concepts we've already covered in class to help ensure that they are properly understanding how to augment this program.
+
+
+## Reflection (old)
 
 This project has a lot of detailed steps that involve heavy hands-on analysis and thinking, which is crucial for students. Not only will they be using AI to help them plan as before, but they will also be using it to thoroughly check their logic in depth, without it necessarily doing it for them. One thing I found useful was the back and forth discussing my algorithm creation and my reasonings with my AI assistant, since it lets me get real-time feedback and analysis on my thought process. However, it's important to not just rely on this as usual. I think students will need to navigate troubleshooting their logic carefully as the AI can make mistakes as usual. Other than that, I think students will learn a lot about the deep thinking required to make algorithmic models catering to people's tastes. 
 
